@@ -1,4 +1,5 @@
-// Публічне відстеження заявки за номером. Без контактних даних і адрес.
+// Публічне відстеження заявки за номером. Номери заявок прості числа, тому тут
+// НЕ повертаємо телефон, адресу отримувача, кінець маршруту та прізвище волонтера.
 import { Router } from 'express';
 import { query } from '../db.js';
 import { HttpError, asyncHandler, idParam } from '../utils.js';
@@ -27,12 +28,15 @@ router.get('/:id', asyncHandler(async (req, res) => {
 
   const deliveries = await query(
     `SELECT d.delivery_id, ds.status_id, ds.status_name, d.planned_date, d.actual_date,
-            v.volunteer_name, rt.start_point, rt.end_point
+            SPLIT_PART(v.volunteer_name, ' ', 1) AS volunteer_first_name,
+            rt.start_point,
+            (f.feedback_id IS NOT NULL) AS has_feedback
      FROM aid_kit k
      JOIN delivery d         ON d.kit_id = k.kit_id
      JOIN delivery_status ds ON ds.status_id = d.status_id
      JOIN volunteer v        ON v.volunteer_id = d.volunteer_id
      JOIN route rt           ON rt.route_id = d.route_id
+     LEFT JOIN feedback f    ON f.delivery_id = d.delivery_id
      WHERE k.request_id = $1
      ORDER BY d.delivery_id`,
     [id]

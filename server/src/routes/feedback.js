@@ -11,6 +11,16 @@ router.get('/', asyncHandler(async (req, res) => {
   res.json(rows);
 }));
 
+// GET /api/feedback/public   публічний список відгуків: без імен отримувача й волонтера
+router.get('/public', asyncHandler(async (req, res) => {
+  const { rows } = await query(
+    `SELECT feedback_id, rating, review_text, region, feedback_date
+     FROM v_feedback_full
+     ORDER BY feedback_date DESC, feedback_id DESC`
+  );
+  res.json(rows);
+}));
+
 // GET /api/feedback/summary   середня оцінка і розподіл оцінок
 router.get('/summary', asyncHandler(async (req, res) => {
   const total = await query('SELECT COUNT(*) AS count, ROUND(AVG(rating), 2) AS average FROM feedback');

@@ -84,7 +84,7 @@ function Stats() {
 }
 
 function Reviews() {
-  const { data, error, loading, reload } = useApi('/feedback');
+  const { data, error, loading, reload } = useApi('/feedback/public');
   const best = data && [...data].filter((f) => f.review_text).sort((a, b) => b.rating - a.rating || (a.feedback_date < b.feedback_date ? 1 : -1)).slice(0, 3);
 
   return (

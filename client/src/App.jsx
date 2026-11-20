@@ -4,6 +4,10 @@ import AdminLayout from './components/AdminLayout.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import Home from './pages/public/Home.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import NewRequest from './pages/public/NewRequest.jsx';
+import Track from './pages/public/Track.jsx';
+import Donate from './pages/public/Donate.jsx';
+import Reviews from './pages/public/Reviews.jsx';
 import ComingSoon from './pages/ComingSoon.jsx';
 
 export default function App() {
@@ -14,11 +18,11 @@ export default function App() {
         {/* Публічний сайт */}
         <Route element={<PublicLayout />}>
           <Route index element={<Home />} />
-          <Route path="request" element={<ComingSoon title="Подати заявку на допомогу" />} />
-          <Route path="track" element={<ComingSoon title="Відстежити заявку" />} />
-          <Route path="track/:id" element={<ComingSoon title="Стан заявки" />} />
-          <Route path="donate" element={<ComingSoon title="Допомогти як донор" />} />
-          <Route path="reviews" element={<ComingSoon title="Відгуки отримувачів" />} />
+          <Route path="request" element={<NewRequest />} />
+          <Route path="track" element={<Track />} />
+          <Route path="track/:id" element={<Track />} />
+          <Route path="donate" element={<Donate />} />
+          <Route path="reviews" element={<Reviews />} />
           <Route path="*" element={<ComingSoon title="Сторінку не знайдено" notFound />} />
         </Route>
 
