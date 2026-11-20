@@ -135,7 +135,7 @@ export default function Track() {
             </dl>
             <ul className="item-list" aria-label="Що замовлено">
               {data.items.map((i) => (
-                <li key={i.item_name}><span>{i.item_name}</span><strong>{i.quantity_needed} {i.unit}</strong></li>
+                <li key={i.item_name}><span>{i.item_name}</span><strong>{i.quantity_needed} × {i.unit}</strong></li>
               ))}
             </ul>
           </section>

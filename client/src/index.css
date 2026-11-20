@@ -302,7 +302,7 @@ img, svg { display: block; max-width: 100%; }
 .admin__content { padding: 40px 40px 64px; display: grid; gap: 32px; align-content: start; max-width: 1280px; width: 100%; }
 
 @media (max-width: 960px) {
-  .admin { grid-template-columns: 1fr; }
+  .admin { grid-template-columns: minmax(0, 1fr); }
   .sidebar { position: static; height: auto; }
   .sidebar__nav, .sidebar__foot { display: none; }
   .sidebar.open .sidebar__nav, .sidebar.open .sidebar__foot { display: grid; }
@@ -453,3 +453,28 @@ textarea.input { min-height: 112px; padding: 12px 16px; resize: vertical; line-h
 .review__text { color: var(--ink); font-size: 1.0625rem; max-width: 70ch; }
 .two-col { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 40px; align-items: start; }
 @media (max-width: 960px) { .two-col { grid-template-columns: 1fr; } }
+
+/* =====================================================================
+   Адмінка: діалоги, фільтри, дії
+   ===================================================================== */
+.dialog { border: 0; padding: 0; border-radius: var(--radius-lg); width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48px); box-shadow: 0 24px 64px rgb(15 36 80 / 0.28); color: var(--text); }
+.dialog::backdrop { background: rgb(15 36 80 / 0.5); }
+.dialog__head { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--line); }
+.dialog__head h2 { font-size: 1.25rem; }
+.dialog__body { padding: 24px; display: grid; gap: 20px; overflow-y: auto; max-height: calc(100vh - 160px); }
+.dialog__foot { display: flex; flex-wrap: wrap; gap: 12px; padding-top: 4px; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: inherit; font-weight: 500; cursor: pointer; }
+.chip:hover { border-color: var(--blue); }
+.chip[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.btn--danger { background: transparent; color: var(--red); border-color: #efc4c4; }
+.btn--danger:hover { background: var(--red-tint); border-color: var(--red); color: var(--red); }
+.notice { padding: 12px 16px; border-radius: var(--radius); background: var(--green-tint); color: var(--green); font-weight: 500; }
+.dialog .item-list li { padding: 8px 0; }
+.admin__content { grid-template-columns: minmax(0, 1fr); }
+.admin__content > * { min-width: 0; }
+.table .btn--small { min-height: 40px; padding: 0 12px; }
+.table .row-actions { min-width: 170px; }
+.table-wrap { position: relative; }

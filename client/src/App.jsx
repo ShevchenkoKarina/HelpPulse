@@ -8,6 +8,9 @@ import NewRequest from './pages/public/NewRequest.jsx';
 import Track from './pages/public/Track.jsx';
 import Donate from './pages/public/Donate.jsx';
 import Reviews from './pages/public/Reviews.jsx';
+import AdminRequests from './pages/admin/AdminRequests.jsx';
+import AdminKits from './pages/admin/AdminKits.jsx';
+import AdminDeliveries from './pages/admin/AdminDeliveries.jsx';
 import ComingSoon from './pages/ComingSoon.jsx';
 
 export default function App() {
@@ -29,9 +32,9 @@ export default function App() {
         {/* Керування (для координаторів) */}
         <Route path="admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
-          <Route path="requests" element={<ComingSoon title="Заявки" admin />} />
-          <Route path="kits" element={<ComingSoon title="Набори допомоги" admin />} />
-          <Route path="deliveries" element={<ComingSoon title="Доставки" admin />} />
+          <Route path="requests" element={<AdminRequests />} />
+          <Route path="kits" element={<AdminKits />} />
+          <Route path="deliveries" element={<AdminDeliveries />} />
           <Route path="stock" element={<ComingSoon title="Склад і залишки" admin />} />
           <Route path="donations" element={<ComingSoon title="Пожертви" admin />} />
           <Route path="volunteers" element={<ComingSoon title="Волонтери" admin />} />
