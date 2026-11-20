@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
-  BarChart3, BookOpen, ClipboardList, Globe, HeartHandshake, LayoutDashboard,
+  BarChart3, BookOpen, LogOut, ClipboardList, Globe, HeartHandshake, LayoutDashboard,
   Menu, MessageSquare, Package, Truck, Users, Warehouse, X,
 } from 'lucide-react';
 import Brand from './Brand.jsx';
+import { clearToken } from '../api/auth.js';
 
 const LINKS = [
   { to: '/admin', label: 'Огляд', icon: LayoutDashboard, end: true },
@@ -22,6 +23,8 @@ const LINKS = [
 export default function AdminLayout() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const logout = () => { clearToken(); navigate('/'); };
   useEffect(() => setOpen(false), [pathname]);
 
   return (
@@ -52,6 +55,10 @@ export default function AdminLayout() {
             <Globe size={20} aria-hidden="true" />
             Публічний сайт
           </NavLink>
+          <button type="button" className="sidebar__link sidebar__btn" onClick={logout}>
+            <LogOut size={20} aria-hidden="true" />
+            Вийти
+          </button>
         </div>
       </aside>
       <div className="admin__main">

@@ -6,6 +6,15 @@ import { HttpError, asyncHandler, idParam } from '../utils.js';
 
 const router = Router();
 
+// GET /api/track/board   «Зараз у русі» для головної: без імен, адрес і номерів (лише склад, область, статус, дата)
+router.get('/board', asyncHandler(async (req, res) => {
+  const { rows } = await query(
+    `SELECT warehouse_name, region, status_name, planned_date
+     FROM v_active_deliveries ORDER BY planned_date, delivery_id`
+  );
+  res.json(rows);
+}));
+
 // GET /api/track/:id   стан заявки, перелік товарів і статус доставок
 router.get('/:id', asyncHandler(async (req, res) => {
   const id = idParam(req, 'номер заявки');

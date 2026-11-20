@@ -11,6 +11,7 @@ import Reviews from './pages/public/Reviews.jsx';
 import AdminRequests from './pages/admin/AdminRequests.jsx';
 import AdminKits from './pages/admin/AdminKits.jsx';
 import AdminDeliveries from './pages/admin/AdminDeliveries.jsx';
+import RequireAdmin from './components/RequireAdmin.jsx';
 import ComingSoon from './pages/ComingSoon.jsx';
 
 export default function App() {
@@ -30,7 +31,7 @@ export default function App() {
         </Route>
 
         {/* Керування (для координаторів) */}
-        <Route path="admin" element={<AdminLayout />}>
+        <Route path="admin" element={<RequireAdmin><AdminLayout /></RequireAdmin>}>
           <Route index element={<AdminDashboard />} />
           <Route path="requests" element={<AdminRequests />} />
           <Route path="kits" element={<AdminKits />} />

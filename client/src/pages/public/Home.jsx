@@ -9,7 +9,7 @@ import { formatDate, formatNumber, plural } from '../../utils/format.js';
 
 /** Табло живих доставок. Лише склад і область: без імен та адрес отримувачів. */
 function LiveBoard() {
-  const { data, error, loading, reload } = useApi('/deliveries?active=true');
+  const { data, error, loading, reload } = useApi('/track/board');
 
   return (
     <section className="board" aria-labelledby="board-title">
@@ -22,8 +22,8 @@ function LiveBoard() {
       {data && data.length === 0 && <p className="board__empty">Активних доставок зараз немає.</p>}
       {data && data.length > 0 && (
         <ul className="board__list">
-          {data.slice(0, 3).map((d) => (
-            <li key={d.delivery_id} className="delivery-card">
+          {data.slice(0, 3).map((d, i) => (
+            <li key={i} className="delivery-card">
               <div className="delivery-card__top">
                 <span className="delivery-card__route">{d.warehouse_name} → {d.region} область</span>
                 <span className="delivery-card__meta">очікується {formatDate(d.planned_date)}</span>

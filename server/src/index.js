@@ -12,6 +12,7 @@ import stockRouter from './routes/stock.js';
 import feedbackRouter from './routes/feedback.js';
 import trackRouter from './routes/track.js';
 import reportsRouter from './routes/reports.js';
+import authRouter, { guard } from './auth.js';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
@@ -20,6 +21,7 @@ app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173' }));
 app.use(express.json());
 
 // Перевірка, що сервер і база даних працюють
+app.set('trust proxy', false);
 app.get('/api/health', async (req, res, next) => {
   try {
     const { rows } = await query('SELECT NOW() AS server_time, current_database() AS db');
@@ -28,6 +30,10 @@ app.get('/api/health', async (req, res, next) => {
     next(err);
   }
 });
+
+// Захист: усе, що не в списку публічних маршрутів, вимагає входу координатора
+app.use('/api', guard);
+app.use('/api/auth', authRouter);
 
 // Довідники та прості сутності: categories, items, requesters, donors, warehouses, volunteers, routes
 app.use('/api', refsRouter);

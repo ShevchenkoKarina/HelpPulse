@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import Brand from './Brand.jsx';
+import AdminLogin from './AdminLogin.jsx';
+import { api } from '../api/client.js';
+import { getToken } from '../api/auth.js';
 
 const LINKS = [
   { to: '/', label: 'Головна', end: true },
@@ -14,7 +17,18 @@ const LINKS = [
 export default function PublicLayout() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const [login, setLogin] = useState(false);
   useEffect(() => setOpen(false), [pathname]);
+
+  // Якщо вхід уже виконано, кнопка веде одразу в адмінку; інакше показує вікно з паролем
+  async function openAdmin() {
+    setOpen(false);
+    if (getToken()) {
+      try { await api('/auth/check'); navigate('/admin'); return; } catch { /* токен недійсний */ }
+    }
+    setLogin(true);
+  }
 
   return (
     <div className="app">
@@ -36,12 +50,13 @@ export default function PublicLayout() {
                 </li>
               ))}
             </ul>
-            <Link to="/admin" className="btn btn--ghost btn--small">Керування</Link>
+            <button type="button" className="btn btn--ghost btn--small" onClick={openAdmin}>Керування</button>
           </nav>
         </div>
       </header>
 
       <main id="content"><Outlet /></main>
+      {login && <AdminLogin onClose={() => setLogin(false)} onSuccess={() => { setLogin(false); navigate('/admin'); }} />}
 
       <footer className="footer">
         <div className="container">
@@ -65,7 +80,7 @@ export default function PublicLayout() {
               <h3>Для донорів і команди</h3>
               <ul>
                 <li><Link to="/donate">Передати допомогу</Link></li>
-                <li><Link to="/admin">Керування платформою</Link></li>
+                <li><button type="button" className="footer__link" onClick={openAdmin}>Керування платформою</button></li>
               </ul>
             </div>
           </div>
