@@ -12,6 +12,12 @@ import AdminRequests from './pages/admin/AdminRequests.jsx';
 import AdminKits from './pages/admin/AdminKits.jsx';
 import AdminDeliveries from './pages/admin/AdminDeliveries.jsx';
 import RequireAdmin from './components/RequireAdmin.jsx';
+import AdminStock from './pages/admin/AdminStock.jsx';
+import AdminDonations from './pages/admin/AdminDonations.jsx';
+import AdminVolunteers from './pages/admin/AdminVolunteers.jsx';
+import AdminRefs from './pages/admin/AdminRefs.jsx';
+import AdminFeedback from './pages/admin/AdminFeedback.jsx';
+import AdminReports from './pages/admin/AdminReports.jsx';
 import ComingSoon from './pages/ComingSoon.jsx';
 
 export default function App() {
@@ -36,12 +42,12 @@ export default function App() {
           <Route path="requests" element={<AdminRequests />} />
           <Route path="kits" element={<AdminKits />} />
           <Route path="deliveries" element={<AdminDeliveries />} />
-          <Route path="stock" element={<ComingSoon title="Склад і залишки" admin />} />
-          <Route path="donations" element={<ComingSoon title="Пожертви" admin />} />
-          <Route path="volunteers" element={<ComingSoon title="Волонтери" admin />} />
-          <Route path="refs" element={<ComingSoon title="Довідники" admin />} />
-          <Route path="feedback" element={<ComingSoon title="Відгуки" admin />} />
-          <Route path="reports" element={<ComingSoon title="Звіти" admin />} />
+          <Route path="stock" element={<AdminStock />} />
+          <Route path="donations" element={<AdminDonations />} />
+          <Route path="volunteers" element={<AdminVolunteers />} />
+          <Route path="refs" element={<AdminRefs />} />
+          <Route path="feedback" element={<AdminFeedback />} />
+          <Route path="reports" element={<AdminReports />} />
         </Route>
       </Routes>
     </>

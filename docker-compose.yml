@@ -1,4 +1,5 @@
 # HelpPulse: запуск усього проєкту однією командою:  docker compose up --build
+# Після запуску: сайт http://localhost:8080, API http://localhost:5000/api
 # Налаштування беруться з файлу .env (шаблон: .env.example).
 
 services:
@@ -43,10 +44,16 @@ services:
       db:
         condition: service_healthy
 
-  # Фронтенд (React + Vite) з'являється на кроці 4
-  # client:
-  #   build: ./client
-  #   ...
+  # Фронтенд (React): nginx віддає сайт і передає запити /api бекенду.
+  # Сайт відкривається на http://localhost:8080
+  client:
+    build: ./client
+    container_name: helppulse_client
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - server
 
 volumes:
   helppulse_pgdata:
