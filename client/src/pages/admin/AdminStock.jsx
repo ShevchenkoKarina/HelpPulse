@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from '../../api/client.js';
 import { useApi } from '../../hooks/useApi.js';
 import { formatNumber } from '../../utils/format.js';
 import PageHeader from '../../components/PageHeader.jsx';
-import Filters from '../../components/Filters.jsx';
 import Dialog from '../../components/Dialog.jsx';
 import Field from '../../components/Field.jsx';
 import { Empty, ErrorState, Loading } from '../../components/States.jsx';
@@ -24,7 +23,7 @@ function EditDialog({ row, onClose, onSaved }) {
   return (
     <Dialog title="Виправити залишок" onClose={onClose} small>
       <form className="form" onSubmit={submit} noValidate style={{ gap: 16 }}>
-        <p><strong>{row.item_name}</strong><br /><span className="muted">{row.warehouse_name}, зараз {formatNumber(row.quantity)} {row.unit}</span></p>
+        <p><strong>{row.item_name}</strong><br /><span className="muted">{row.warehouse_name}, зараз {formatNumber(row.quantity)} × {row.unit}</span></p>
         <Field label="Фактична кількість (інвентаризація)" error={err}>
           <input className="input" type="number" min="0" step="1" value={qty} onChange={(e) => { setQty(e.target.value); setErr(''); }} />
         </Field>
@@ -37,60 +36,69 @@ function EditDialog({ row, onClose, onSaved }) {
   );
 }
 
+/** Повертає значення із затримкою: пошук іде, коли людина зробила паузу в наборі, а не після кожної літери. */
+function useDebounced(value, ms = 300) {
+  const [v, setV] = useState(value);
+  useEffect(() => { const t = setTimeout(() => setV(value), ms); return () => clearTimeout(t); }, [value, ms]);
+  return v;
+}
+
 export default function AdminStock() {
-  const [mode, setMode] = useState('wh');
   const [wh, setWh] = useState('');
-  const [min, setMin] = useState('0');
+  const [category, setCategory] = useState('');
+  const [name, setName] = useState('');
   const warehouses = useApi('/warehouses');
-  const stock = useApi(mode === 'wh' ? `/stock${wh ? `?warehouse_id=${wh}` : ''}` : `/stock/totals?min=${Number(min) >= 0 ? Number(min) : 0}`);
+
+  // Усі три умови діють разом (склад І категорія І назва)
+  const dCategory = useDebounced(category).trim();
+  const dName = useDebounced(name).trim();
+  const qs = new URLSearchParams();
+  if (wh) qs.set('warehouse_id', wh);
+  if (dCategory) qs.set('category', dCategory);
+  if (dName) qs.set('q', dName);
+  const { data, error, loading, reload } = useApi(`/stock${qs.toString() ? `?${qs}` : ''}`);
   const [edit, setEdit] = useState(null);
-  const { data, error, loading, reload } = stock;
+  const filtered = !!(wh || category.trim() || name.trim());
+  const reset = () => { setWh(''); setCategory(''); setName(''); };
 
   return (
     <>
-      <PageHeader title="Склад і залишки">Скільки чого лежить на складах. Залишки змінюються автоматично: пожертви додають, набори списують.</PageHeader>
-      <div className="toolbar">
-        <Filters label="Вигляд" value={mode} onChange={setMode} options={[{ value: 'wh', label: 'По складах' }, { value: 'total', label: 'Разом по товарах' }]} />
-        {mode === 'wh' ? (
-          <div className="toolbar__search">
-            <label className="sr-only" htmlFor="wh">Склад</label>
-            <select id="wh" className="input select" value={wh} onChange={(e) => setWh(e.target.value)}>
-              <option value="">Усі склади</option>
-              {(warehouses.data || []).map((w) => <option key={w.warehouse_id} value={w.warehouse_id}>{w.warehouse_name}</option>)}
-            </select>
-          </div>
-        ) : (
-          <div className="toolbar__search">
-            <label className="sr-only" htmlFor="min">Показувати товари, яких разом більше ніж</label>
-            <input id="min" className="input" type="number" min="0" value={min} onChange={(e) => setMin(e.target.value)} placeholder="Більше ніж… (наприклад, 100)" />
-          </div>
-        )}
+      <PageHeader title="Склад і залишки">Скільки чого лежить на складах: від більшого залишку до меншого. Залишки змінюються автоматично: пожертви додають, набори списують.</PageHeader>
+      <div className="stock-filters">
+        <div>
+          <label className="sr-only" htmlFor="wh">Склад</label>
+          <select id="wh" className="input select" value={wh} onChange={(e) => setWh(e.target.value)}>
+            <option value="">Усі склади</option>
+            {(warehouses.data || []).map((w) => <option key={w.warehouse_id} value={w.warehouse_id}>{w.warehouse_name}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="sr-only" htmlFor="cat">Пошук за категорією</label>
+          <input id="cat" className="input" type="search" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Категорія, наприклад: Їжа" autoComplete="off" />
+        </div>
+        <div>
+          <label className="sr-only" htmlFor="nm">Пошук за назвою товару</label>
+          <input id="nm" className="input" type="search" value={name} onChange={(e) => setName(e.target.value)} placeholder="Назва товару, наприклад: вода" autoComplete="off" />
+        </div>
+        {filtered && <button type="button" className="btn btn--ghost" onClick={reset}>Скинути</button>}
       </div>
       <section className="panel">
-        {loading && <Loading />}
+        {loading && !data && <Loading />}
         {error && <ErrorState error={error} onRetry={reload} />}
-        {data && data.length === 0 && <Empty>За цим фільтром нічого немає.</Empty>}
-        {data && data.length > 0 && mode === 'wh' && (
+        {data && data.length === 0 && <Empty>За цими умовами нічого не знайдено. Спробуйте змінити або скинути пошук.</Empty>}
+        {data && data.length > 0 && (
           <div className="table-wrap"><table className="table">
             <thead><tr><th>Склад</th><th>Категорія</th><th>Товар</th><th className="num">Залишок</th><th><span className="sr-only">Дії</span></th></tr></thead>
             <tbody>{data.map((r) => (
               <tr key={`${r.warehouse_id}-${r.item_id}`}>
                 <td className="nowrap">{r.warehouse_name}</td><td>{r.category_name}</td><td>{r.item_name}</td>
-                <td className={`num${r.quantity < LOW ? ' low' : ''}`}>{formatNumber(r.quantity)} {r.unit}</td>
+                <td className={`num${r.quantity < LOW ? ' low' : ''}`}>{formatNumber(r.quantity)} × {r.unit}</td>
                 <td><div className="row-actions"><button className="btn btn--ghost btn--small" onClick={() => setEdit(r)}>Виправити</button></div></td>
               </tr>))}</tbody>
           </table></div>
         )}
-        {data && data.length > 0 && mode === 'total' && (
-          <div className="table-wrap"><table className="table">
-            <thead><tr><th>Товар</th><th>Категорія</th><th className="num">Разом на всіх складах</th></tr></thead>
-            <tbody>{data.map((r) => (
-              <tr key={r.item_id}><td>{r.item_name}</td><td>{r.category_name}</td><td className="num">{formatNumber(r.total_quantity)} {r.unit}</td></tr>))}</tbody>
-          </table></div>
-        )}
       </section>
-      {mode === 'wh' && <p className="muted">Червоним позначено залишок менше {LOW}.</p>}
-      {mode === 'total' && <p className="muted">Це запит із групуванням: GROUP BY + HAVING SUM(quantity) &gt; {Number(min) || 0}.</p>}
+      {data && data.length > 0 && <p className="muted">Знайдено позицій: {data.length}. Червоним позначено залишок менше {LOW}.</p>}
       {edit && <EditDialog row={edit} onClose={() => setEdit(null)} onSaved={reload} />}
     </>
   );

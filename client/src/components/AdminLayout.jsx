@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
-  BarChart3, BookOpen, LogOut, ClipboardList, Globe, HeartHandshake, LayoutDashboard,
+  BarChart3, BookOpen, LogOut, ClipboardList, HeartHandshake, LayoutDashboard,
   Menu, MessageSquare, Package, Truck, Users, Warehouse, X,
 } from 'lucide-react';
 import Brand from './Brand.jsx';
@@ -10,7 +10,7 @@ import { clearToken } from '../api/auth.js';
 const LINKS = [
   { to: '/admin', label: 'Огляд', icon: LayoutDashboard, end: true },
   { to: '/admin/requests', label: 'Заявки', icon: ClipboardList },
-  { to: '/admin/kits', label: 'Набори', icon: Package },
+  { to: '/admin/kits', label: 'Сформовані набори', icon: Package },
   { to: '/admin/deliveries', label: 'Доставки', icon: Truck },
   { to: '/admin/stock', label: 'Склад', icon: Warehouse },
   { to: '/admin/donations', label: 'Пожертви', icon: HeartHandshake },
@@ -51,10 +51,6 @@ export default function AdminLayout() {
           ))}
         </nav>
         <div className="sidebar__foot">
-          <NavLink to="/" className="sidebar__link">
-            <Globe size={20} aria-hidden="true" />
-            Публічний сайт
-          </NavLink>
           <button type="button" className="sidebar__link sidebar__btn" onClick={logout}>
             <LogOut size={20} aria-hidden="true" />
             Вийти

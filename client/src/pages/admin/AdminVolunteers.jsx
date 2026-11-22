@@ -5,8 +5,7 @@ const CFG = {
   path: '/volunteers', idKey: 'volunteer_id', single: 'Волонтер', label: (r) => r.volunteer_name,
   columns: [
     { key: 'volunteer_name', label: 'ПІБ', required: true, type: 'text' },
-    { key: 'phone', label: 'Телефон', required: true, type: 'text' },
-    { key: 'has_vehicle', label: 'Авто', type: 'enum', default: 'N', options: [{ value: 'Y', label: 'Є авто' }, { value: 'N', label: 'Немає авто' }], render: (r) => (r.has_vehicle === 'Y' ? 'є' : 'немає') },
+    { key: 'phone', label: 'Телефон', required: true, type: 'text', placeholder: '+380XXXXXXXXX' },
     { key: 'region', label: 'Область', type: 'text' },
   ],
 };

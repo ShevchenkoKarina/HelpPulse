@@ -5,12 +5,24 @@ import { HttpError, asyncHandler, toInt } from '../utils.js';
 
 const router = Router();
 
-// GET /api/stock                   залишки по всіх складах
+// GET /api/stock                   залишки по всіх складах, від більшого до меншого
 // GET /api/stock?warehouse_id=2    залишки одного складу
 // GET /api/stock?item_id=5         де є цей товар
+// GET /api/stock?category=їж&q=вод пошук за частиною назви категорії та/або товару (без урахування регістру);
+//                                  умови поєднуються через AND, їх можна комбінувати зі складом
 router.get('/', asyncHandler(async (req, res) => {
   const params = [];
   const conditions = [];
+  // Підрядок шукаємо через POSITION, тому символи % і _ у пошуку не працюють як шаблон
+  const search = (value, column, label) => {
+    const text = String(value ?? '').trim();
+    if (!text) return;
+    if (text.length > 100) throw new HttpError(400, `Пошук «${label}» задовгий (максимум 100 символів)`);
+    params.push(text);
+    conditions.push(`POSITION(LOWER($${params.length}) IN LOWER(${column})) > 0`);
+  };
+  search(req.query.category, 'category_name', 'категорія');
+  search(req.query.q, 'item_name', 'товар');
   if (req.query.warehouse_id) {
     params.push(toInt(req.query.warehouse_id, 'склад'));
     conditions.push(`warehouse_id = $${params.length}`);
@@ -21,7 +33,7 @@ router.get('/', asyncHandler(async (req, res) => {
   }
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
   const { rows } = await query(
-    `SELECT * FROM v_stock_overview ${where} ORDER BY warehouse_name, quantity DESC, item_name`,
+    `SELECT * FROM v_stock_overview ${where} ORDER BY quantity DESC, item_name, warehouse_name`,
     params
   );
   res.json(rows);

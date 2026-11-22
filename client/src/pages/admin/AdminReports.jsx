@@ -4,14 +4,13 @@ import PageHeader from '../../components/PageHeader.jsx';
 import StatusBadge from '../../components/StatusBadge.jsx';
 import { Empty, ErrorState, Loading } from '../../components/States.jsx';
 
-/** Панель звіту: заголовок, пояснення, звідки дані, вміст або стан завантаження. */
-function Report({ title, note, path, children, wide }) {
+/** Панель звіту: заголовок, вміст або стан завантаження. */
+function Report({ title, path, children, wide }) {
   const { data, error, loading, reload } = useApi(path);
   return (
     <section className="panel" style={wide ? { gridColumn: '1 / -1' } : undefined}>
       <div className="panel__head">
         <h2 style={{ fontSize: '1.125rem' }}>{title}</h2>
-        <span className="muted">{note}</span>
       </div>
       {loading && <Loading lines={2} />}
       {error && <ErrorState error={error} onRetry={reload} />}
@@ -39,16 +38,16 @@ function Bars({ rows, label, value, yellow }) {
 export default function AdminReports() {
   return (
     <>
-      <PageHeader title="Звіти">Підсумки за даними бази. Кожен звіт це SQL-запит із групуванням, з’єднанням таблиць або підзапитом.</PageHeader>
+      <PageHeader title="Звіти">Підсумки за даними платформи: заявки, доставки, області, донори та волонтери.</PageHeader>
       <div className="report-grid">
-        <Report title="Заявки за статусами" note="GROUP BY request_state" path="/reports/requests-by-state">
+        <Report title="Заявки за статусами" path="/reports/requests-by-state">
           {(rows) => <Bars rows={rows} label={(r) => r.request_state} value="count" />}
         </Report>
-        <Report title="Доставки за статусами" note="LEFT JOIN + GROUP BY" path="/reports/deliveries-by-status">
+        <Report title="Доставки за статусами" path="/reports/deliveries-by-status">
           {(rows) => <Bars rows={rows} label={(r) => r.status_name} value="count" yellow />}
         </Report>
 
-        <Report title="Виконані доставки за областями" note="COUNT + GROUP BY + підзапит MAX (ЛР №5, №7)" path="/reports/regions">
+        <Report title="Виконані доставки за областями" path="/reports/regions">
           {(rows) => (
             <div className="table-wrap"><table className="table">
               <thead><tr><th>Область</th><th className="num">Доставок</th><th>Примітка</th></tr></thead>
@@ -57,7 +56,7 @@ export default function AdminReports() {
             </table></div>
           )}
         </Report>
-        <Report title="Внесок донорів" note="JOIN + SUM + GROUP BY" path="/reports/donations-by-donor">
+        <Report title="Внесок донорів" path="/reports/donations-by-donor">
           {(rows) => (
             <div className="table-wrap"><table className="table">
               <thead><tr><th>Донор</th><th>Тип</th><th className="num">Пожертв</th><th className="num">Одиниць</th></tr></thead>
@@ -67,7 +66,7 @@ export default function AdminReports() {
           )}
         </Report>
 
-        <Report wide title="Волонтери: доставки та оцінка" note="LEFT JOIN, COUNT FILTER, AVG (ЛР №5, №6)" path="/reports/volunteers">
+        <Report wide title="Волонтери: доставки та оцінка" path="/reports/volunteers">
           {(rows) => (
             <div className="table-wrap"><table className="table">
               <thead><tr><th>Волонтер</th><th>Область</th><th className="num">Усього</th><th className="num">Доставлено</th><th className="num">Активних</th><th className="num">Середня оцінка</th></tr></thead>
@@ -77,7 +76,7 @@ export default function AdminReports() {
           )}
         </Report>
 
-        <Report wide title="Доставки без відгуку" note="LEFT JOIN ... WHERE feedback_id IS NULL (ЛР №6)" path="/reports/deliveries-without-feedback">
+        <Report wide title="Доставки без відгуку" path="/reports/deliveries-without-feedback">
           {(rows) => (
             <div className="table-wrap"><table className="table">
               <thead><tr><th>Доставка</th><th>Статус</th><th>Планова дата</th><th>Фактична дата</th></tr></thead>

@@ -44,7 +44,7 @@ router.use('/items', crud({
 router.use('/requesters', crud({
   table: 'requester',
   pk: 'requester_id',
-  orderBy: 'requester_name',
+  orderBy: 'requester_id DESC', // найновіші заявники першими
   columns: {
     requester_name: col.str('Назва / ПІБ', { max: 150 }),
     requester_type: col.enum('Тип заявника', ['людина', 'лікарня', 'організація']),
@@ -87,7 +87,6 @@ router.use('/volunteers', crud({
   columns: {
     volunteer_name: col.str('ПІБ', { max: 150 }),
     phone: col.str('Телефон', { max: 20 }),
-    has_vehicle: col.enum('Наявність авто', ['Y', 'N'], { required: false }),
     region: col.str('Область', { max: 100, required: false }),
   },
 }));

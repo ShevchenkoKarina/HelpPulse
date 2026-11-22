@@ -29,7 +29,7 @@ function RequestDialog({ id, onClose, onChanged }) {
   }
   const makeKit = () => {
     if (!wh) { setMsg({ type: 'err', text: 'Оберіть склад, з якого збирати набір' }); return; }
-    run(() => api('/kits', { method: 'POST', body: { request_id: id, warehouse_id: Number(wh) } }), 'Набір сформовано, товари списано зі складу. Далі призначте доставку у розділі «Набори».');
+    run(() => api('/kits', { method: 'POST', body: { request_id: id, warehouse_id: Number(wh) } }), '');
   };
   const cancel = () => run(() => api(`/requests/${id}`, { method: 'PATCH', body: { request_state: 'скасована' } }), 'Заявку скасовано');
   const canAct = r && (r.request_state === 'нова' || r.request_state === 'в обробці');
@@ -51,21 +51,29 @@ function RequestDialog({ id, onClose, onChanged }) {
           <ul className="item-list" aria-label="Потрібні товари">
             {r.items.map((i) => <li key={i.item_id}><span>{i.item_name}</span><strong>{formatNumber(i.quantity_needed)} × {i.unit}</strong></li>)}
           </ul>
-          {canAct && (
-            <>
-              <Field label="Склад для комплектації" hint="Товари буде списано з обраного складу. Якщо їх не вистачає, набір не створиться.">
-                <select className="input select" value={wh} onChange={(e) => setWh(e.target.value)}>
-                  <option value="">Оберіть склад…</option>
-                  {(warehouses.data || []).map((w) => <option key={w.warehouse_id} value={w.warehouse_id}>{w.warehouse_name}</option>)}
-                </select>
-              </Field>
-              <div className="dialog__foot">
-                <button type="button" className="btn btn--primary" onClick={makeKit} disabled={busy}>Сформувати набір</button>
-                <button type="button" className="btn btn--danger" onClick={cancel} disabled={busy}>Скасувати заявку</button>
-              </div>
-            </>
+          {canAct && !r.kit && (
+            <Field label="Склад для комплектації" hint="Товари буде списано з обраного складу. Якщо їх не вистачає, набір не створиться.">
+              <select className="input select" value={wh} onChange={(e) => setWh(e.target.value)}>
+                <option value="">Оберіть склад…</option>
+                {(warehouses.data || []).map((w) => <option key={w.warehouse_id} value={w.warehouse_id}>{w.warehouse_name}</option>)}
+              </select>
+            </Field>
           )}
-          {msg.type === 'ok' && <div className="notice" role="status">{msg.text}</div>}
+          {r.kit && (
+            <div className="notice" role="status">
+              Набір № {r.kit.kit_id} сформовано на складі «{r.kit.warehouse_name}», товари списано.
+              {canAct && (r.kit.delivery_id
+                ? ` Доставку призначено (№ ${r.kit.delivery_id}).`
+                : ' Далі призначте доставку у розділі «Сформовані набори».')}
+            </div>
+          )}
+          {canAct && (
+            <div className="dialog__foot">
+              {!r.kit && <button type="button" className="btn btn--primary" onClick={makeKit} disabled={busy}>Сформувати набір</button>}
+              <button type="button" className="btn btn--danger" onClick={cancel} disabled={busy}>Скасувати заявку</button>
+            </div>
+          )}
+          {msg.type === 'ok' && msg.text && <div className="notice" role="status">{msg.text}</div>}
           {msg.type === 'err' && <div className="alert" role="alert">{msg.text}</div>}
         </>
       )}

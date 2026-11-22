@@ -1,5 +1,6 @@
 // Публічне відстеження заявки за номером. Номери заявок прості числа, тому тут
-// НЕ повертаємо телефон, адресу отримувача, кінець маршруту та прізвище волонтера.
+// НЕ повертаємо телефон, кінець маршруту та прізвище волонтера. Адресу доставки повертаємо:
+// її бачить той, хто знає номер заявки.
 import { Router } from 'express';
 import { query } from '../db.js';
 import { HttpError, asyncHandler, idParam } from '../utils.js';
@@ -20,7 +21,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
   const id = idParam(req, 'номер заявки');
 
   const head = await query(
-    `SELECT hr.request_id, hr.created_at, hr.priority, hr.request_state, r.region
+    `SELECT hr.request_id, hr.created_at, hr.priority, hr.request_state, r.region, r.address
      FROM help_request hr
      JOIN requester r ON r.requester_id = hr.requester_id
      WHERE hr.request_id = $1`,

@@ -40,7 +40,8 @@ export default function ItemsPicker({ catalog, rows, onChange, error, showRowErr
                 aria-invalid={badItem ? 'true' : undefined}
                 onChange={(e) => update(r.key, { item_id: e.target.value })}
               >
-                <option value="">Оберіть товар…</option>
+                {/* Підказка видна в закритому списку, але в розкритому її немає */}
+                <option value="" disabled hidden>Оберіть товар…</option>
                 {Object.entries(groups).map(([cat, list]) => (
                   <optgroup key={cat} label={cat}>
                     {list.map((i) => (

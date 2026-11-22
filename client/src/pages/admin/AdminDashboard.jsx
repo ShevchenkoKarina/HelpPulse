@@ -11,7 +11,6 @@ function ActiveDeliveries() {
     <section className="panel" aria-labelledby="active-title">
       <div className="panel__head">
         <h2 id="active-title" style={{ fontSize: '1.25rem' }}>Активні доставки</h2>
-        <span className="muted">Дані з представлення v_active_deliveries</span>
       </div>
       {loading && <Loading />}
       {error && <ErrorState error={error} onRetry={reload} />}

@@ -82,7 +82,7 @@ function Delivery({ d, index, total, reload }) {
       <dl className="kv">
         <div><dt>Звідки їде</dt><dd>{d.start_point}</dd></div>
         <div><dt>Волонтер</dt><dd>{d.volunteer_first_name}</dd></div>
-        <div><dt>{delivered ? 'Доставлено' : 'Планова дата'}</dt><dd>{formatDate(delivered ? d.actual_date : d.planned_date)}</dd></div>
+        <div><dt>{delivered ? 'Доставлено' : 'Планова дата доставки'}</dt><dd>{formatDate(delivered ? d.actual_date : d.planned_date)}</dd></div>
       </dl>
       {delivered && (d.has_feedback
         ? <p className="muted" style={{ display: 'flex', gap: 8, alignItems: 'center' }}><CheckCircle2 size={18} color="var(--green)" aria-hidden="true" /> Дякуємо, відгук уже залишено.</p>
@@ -133,6 +133,7 @@ export default function Track() {
               <div><dt>Область</dt><dd>{data.region}</dd></div>
               <div><dt>Терміновість</dt><dd>{data.priority}</dd></div>
             </dl>
+            <dl className="kv"><div><dt>Адреса доставки</dt><dd>{data.address}</dd></div></dl>
             <ul className="item-list" aria-label="Що замовлено">
               {data.items.map((i) => (
                 <li key={i.item_name}><span>{i.item_name}</span><strong>{i.quantity_needed} × {i.unit}</strong></li>

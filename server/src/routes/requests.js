@@ -59,7 +59,19 @@ router.get('/:id', asyncHandler(async (req, res) => {
     [id]
   );
 
-  res.json({ ...head.rows[0], items: items.rows });
+  // Набір, сформований для заявки (якщо є), щоб форма не пропонувала створити його вдруге
+  const kit = await query(
+    `SELECT k.kit_id, k.created_at, w.warehouse_name, d.delivery_id
+     FROM aid_kit k
+     JOIN warehouse w     ON w.warehouse_id = k.warehouse_id
+     LEFT JOIN delivery d ON d.kit_id = k.kit_id
+     WHERE k.request_id = $1
+     ORDER BY k.kit_id
+     LIMIT 1`,
+    [id]
+  );
+
+  res.json({ ...head.rows[0], items: items.rows, kit: kit.rows[0] || null });
 }));
 
 // POST /api/requests   створення заявки ОДНІЄЮ ТРАНЗАКЦІЄЮ:

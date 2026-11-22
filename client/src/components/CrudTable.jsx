@@ -8,7 +8,7 @@ import { Empty, ErrorState, Loading } from './States.jsx';
 
 /**
  * Універсальна таблиця з додаванням, зміною та видаленням записів (CRUD) для простих таблиць БД.
- * columns: [{ key, label, type: 'text'|'number'|'enum'|'ref', required, options, refPath, refValue, refLabel, hint, table: false, render }]
+ * columns: [{ key, label, type: 'text'|'number'|'enum'|'ref', required, options, refPath, refValue, refLabel, hint, placeholder, table: false, render }]
  */
 function RowForm({ cfg, row, refs, onClose, onSaved }) {
   const editing = !!row;
@@ -52,7 +52,7 @@ function RowForm({ cfg, row, refs, onClose, onSaved }) {
                 {(refs[c.key] || []).map((o) => <option key={o[c.refValue]} value={o[c.refValue]}>{o[c.refLabel]}</option>)}
               </select>
             ) : (
-              <input className="input" type={c.type === 'number' ? 'number' : 'text'} step={c.type === 'number' ? '0.1' : undefined} min={c.type === 'number' ? '0' : undefined} value={f[c.key] ?? ''} onChange={set(c.key)} />
+              <input className="input" type={c.type === 'number' ? 'number' : 'text'} step={c.type === 'number' ? '0.1' : undefined} min={c.type === 'number' ? '0' : undefined} placeholder={c.placeholder} value={f[c.key] ?? ''} onChange={set(c.key)} />
             )}
           </Field>
         ))}

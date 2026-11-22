@@ -7,8 +7,6 @@ import StatusBadge from '../../components/StatusBadge.jsx';
 import DeliveryTrack from '../../components/DeliveryTrack.jsx';
 import Dialog from '../../components/Dialog.jsx';
 import Filters from '../../components/Filters.jsx';
-import Field from '../../components/Field.jsx';
-import StarInput from '../../components/StarInput.jsx';
 import { Empty, ErrorState, Loading } from '../../components/States.jsx';
 
 const FILTERS = [
@@ -17,24 +15,19 @@ const FILTERS = [
 ];
 const NEXT = { 'створено': ['зібрано', 'Зібрано'], 'зібрано': ['в дорозі', 'Відправити'] };
 
-/** Завершення доставки: одна транзакція (статус, дата, заявка, відгук). */
+/** Завершення доставки: одна транзакція (статус, дата, статус заявки). Відгук залишає сам отримувач на сторінці відстеження. */
 function CompleteDialog({ d, onClose, onDone }) {
-  const [rating, setRating] = useState(0);
-  const [text, setText] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   async function submit(e) {
     e.preventDefault(); setBusy(true); setErr('');
-    const body = rating ? { rating, review_text: text.trim() || null } : {};
-    try { await api(`/deliveries/${d.delivery_id}/complete`, { method: 'POST', body }); onDone(); onClose(); }
+    try { await api(`/deliveries/${d.delivery_id}/complete`, { method: 'POST' }); onDone(); onClose(); }
     catch (ex) { setErr(ex.message); } finally { setBusy(false); }
   }
   return (
     <Dialog title={`Завершити доставку № ${d.delivery_id}`} onClose={onClose}>
       <form className="form" onSubmit={submit} style={{ gap: 16 }}>
         <p>Буде встановлено статус «доставлено» і сьогоднішню дату. Якщо це остання доставка за заявкою, заявка стане «виконана».</p>
-        <StarInput legend="Оцінка отримувача (необов’язково)" value={rating} onChange={setRating} />
-        {rating > 0 && <Field label="Відгук" optional><textarea className="input" maxLength={1000} value={text} onChange={(e) => setText(e.target.value)} /></Field>}
         {err && <div className="alert" role="alert">{err}</div>}
         <div className="dialog__foot">
           <button className="btn btn--primary" type="submit" disabled={busy}>Завершити доставку</button>
@@ -77,7 +70,7 @@ function DetailDialog({ d, onClose }) {
           <dl className="kv">
             <div><dt>Отримувач</dt><dd>{data.requester_name}</dd></div>
             <div><dt>Волонтер</dt><dd>{data.volunteer_name}, {data.volunteer_phone}</dd></div>
-            <div><dt>Маршрут</dt><dd>{data.start_point} → {data.end_point} ({data.distance_km} км)</dd></div>
+            <div><dt>Маршрут</dt><dd>{data.start_point} → {data.end_point}{data.distance_km ? ` (${data.distance_km} км)` : ''}</dd></div>
             <div><dt>План / факт</dt><dd>{formatDateShort(data.planned_date)} / {data.actual_date ? formatDateShort(data.actual_date) : '—'}</dd></div>
           </dl>
           {data.volunteer_note && <p><strong>Примітка:</strong> {data.volunteer_note}</p>}
@@ -106,7 +99,7 @@ export default function AdminDeliveries() {
 
   return (
     <>
-      <PageHeader title="Доставки">Рух наборів до отримувачів. Завершення доставки виконується однією транзакцією.</PageHeader>
+      <PageHeader title="Доставки">Відстеження руху наборів до отримувачів. </PageHeader>
       <Filters label="Фільтр за статусом" value={status} onChange={setStatus} options={FILTERS} />
       {rowErr && <div className="alert" role="alert">{rowErr}</div>}
       <section className="panel">

@@ -9,7 +9,7 @@ const router = Router();
 router.get('/', asyncHandler(async (req, res) => {
   const { rows } = await query(
     `SELECT k.kit_id, k.created_at,
-            hr.request_id, hr.request_state, r.requester_name, r.region,
+            hr.request_id, hr.request_state, r.requester_name, r.region, r.address,
             w.warehouse_id, w.warehouse_name,
             d.delivery_id,
             COUNT(ki.item_id)             AS items_count,
@@ -30,7 +30,7 @@ router.get('/', asyncHandler(async (req, res) => {
 router.get('/:id', asyncHandler(async (req, res) => {
   const id = idParam(req, 'номер набору');
   const head = await query(
-    `SELECT k.kit_id, k.created_at, hr.request_id, hr.request_state, r.requester_name, r.region,
+    `SELECT k.kit_id, k.created_at, hr.request_id, hr.request_state, r.requester_name, r.region, r.address,
             w.warehouse_id, w.warehouse_name, d.delivery_id
      FROM aid_kit k
      JOIN help_request hr ON hr.request_id = k.request_id
@@ -73,6 +73,13 @@ router.post('/', asyncHandler(async (req, res) => {
     const state = hr.rows[0].request_state;
     if (['виконана', 'скасована'].includes(state)) {
       throw new HttpError(409, `Заявка має статус «${state}», набір для неї формувати не можна`);
+    }
+
+    // Одна заявка: один набір. Рядок заявки вже заблоковано (FOR UPDATE),
+    // тому два одночасні запити не створять дублікат.
+    const existing = await client.query('SELECT kit_id FROM aid_kit WHERE request_id = $1 LIMIT 1', [requestId]);
+    if (existing.rows.length) {
+      throw new HttpError(409, `Для заявки № ${requestId} набір уже сформовано (набір № ${existing.rows[0].kit_id})`);
     }
 
     const wh = await client.query('SELECT warehouse_name FROM warehouse WHERE warehouse_id = $1', [warehouseId]);

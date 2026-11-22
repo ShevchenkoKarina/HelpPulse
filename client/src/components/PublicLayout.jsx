@@ -50,7 +50,7 @@ export default function PublicLayout() {
                 </li>
               ))}
             </ul>
-            <button type="button" className="btn btn--ghost btn--small" onClick={openAdmin}>Керування</button>
+            <button type="button" className="btn btn--ghost btn--small" onClick={openAdmin}>Вхід</button>
           </nav>
         </div>
       </header>
@@ -64,22 +64,21 @@ export default function PublicLayout() {
             <div>
               <Brand />
               <p style={{ marginTop: 16, maxWidth: '38ch' }}>
-                Платформа, яка пов’язує тих, хто потребує допомоги, з тими, хто може її надати,
-                і показує шлях кожного набору від складу до адресата.
+                Платформа, яка пов’язує тих, хто потребує допомоги, з тими, хто може її надати, бо любов та сила живе поміж нас.
               </p>
             </div>
-            <div>
-              <h3>Для отримувачів</h3>
+                        <div>
+              <h3>Для отримувачів і донорів</h3>
               <ul>
                 <li><Link to="/request">Подати заявку</Link></li>
                 <li><Link to="/track">Відстежити заявку</Link></li>
+                <li><Link to="/donate">Передати допомогу</Link></li>
                 <li><Link to="/reviews">Відгуки</Link></li>
               </ul>
             </div>
             <div>
-              <h3>Для донорів і команди</h3>
+              <h3>Для команди</h3>
               <ul>
-                <li><Link to="/donate">Передати допомогу</Link></li>
                 <li><button type="button" className="footer__link" onClick={openAdmin}>Керування платформою</button></li>
               </ul>
             </div>

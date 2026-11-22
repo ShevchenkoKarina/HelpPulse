@@ -42,7 +42,7 @@ router.get('/regions', asyncHandler(async (req, res) => {
 // (ЛР №5, запит 3; ЛР №6: середня оцінка JOIN + GROUP BY + AVG)
 router.get('/volunteers', asyncHandler(async (req, res) => {
   const { rows } = await query(
-    `SELECT v.volunteer_id, v.volunteer_name, v.phone, v.has_vehicle, v.region,
+    `SELECT v.volunteer_id, v.volunteer_name, v.phone, v.region,
             COUNT(d.delivery_id)                                              AS deliveries_total,
             COUNT(d.delivery_id) FILTER (WHERE ds.status_name = 'доставлено') AS delivered,
             COUNT(d.delivery_id) FILTER (WHERE ds.status_name IN ('створено', 'зібрано', 'в дорозі')) AS active,

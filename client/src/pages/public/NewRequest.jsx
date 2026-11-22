@@ -106,7 +106,7 @@ export default function NewRequest() {
               </select>
             </Field>
           </div>
-          <Field label="Адреса доставки" error={errors.address} hint="Місто, вулиця, будинок. Адресу бачить лише координатор і волонтер.">
+          <Field label="Адреса доставки" error={errors.address} hint="Місто, вулиця, будинок. Її бачать координатор, волонтер і всі, хто знає номер заявки.">
             <input className="input" autoComplete="street-address" value={form.address} onChange={set('address')} maxLength={200} />
           </Field>
         </section>
