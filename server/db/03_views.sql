@@ -1,9 +1,9 @@
 
--- HelpPulse: представлення (VIEW). Основа: ЛР №7.
+-- HelpPulse: представлення (VIEW)
 -- Сайт читає складні вибірки з цих представлень як зі звичайних таблиць.
 
 
--- ЛР №7, завдання 4: активні доставки (створено, зібрано, в дорозі)
+--  активні доставки (створено, зібрано, в дорозі)
 CREATE OR REPLACE VIEW v_active_deliveries AS
 SELECT d.delivery_id,
        hr.request_id,
@@ -27,7 +27,7 @@ JOIN warehouse       w  ON w.warehouse_id  = k.warehouse_id
 JOIN delivery_status ds ON ds.status_id    = d.status_id
 WHERE ds.status_name IN ('створено', 'зібрано', 'в дорозі');
 
--- ЛР №7, завдання 1: усі доставки з повним контекстом (статус заявки,
+--  усі доставки з повним контекстом (статус заявки,
 -- отримувач, волонтер, маршрут, склад, статус доставки)
 CREATE OR REPLACE VIEW v_deliveries_full AS
 SELECT d.delivery_id,
@@ -56,7 +56,7 @@ JOIN route           rt ON rt.route_id     = d.route_id
 JOIN warehouse       w  ON w.warehouse_id  = k.warehouse_id
 JOIN delivery_status ds ON ds.status_id    = d.status_id;
 
--- ЛР №5, запит 2: залишки товарів на складах
+--  залишки товарів на складах
 CREATE OR REPLACE VIEW v_stock_overview AS
 SELECT w.warehouse_id,
        w.warehouse_name,
@@ -70,7 +70,7 @@ JOIN warehouse     w  ON w.warehouse_id = s.warehouse_id
 JOIN item          i  ON i.item_id      = s.item_id
 JOIN item_category ic ON ic.category_id = i.category_id;
 
--- ЛР №5 (запит 5) та ЛР №7 (завдання 2): кількість виконаних доставок за регіонами
+--  кількість виконаних доставок за регіонами
 CREATE OR REPLACE VIEW v_region_delivered AS
 SELECT r.region,
        COUNT(d.delivery_id) AS delivered_count
@@ -82,7 +82,7 @@ JOIN requester       r  ON r.requester_id = hr.requester_id
 WHERE ds.status_name = 'доставлено'
 GROUP BY r.region;
 
--- ЛР №6/№7: відгуки разом з отримувачем, волонтером і доставкою
+--  відгуки разом з отримувачем, волонтером і доставкою
 CREATE OR REPLACE VIEW v_feedback_full AS
 SELECT f.feedback_id,
        f.delivery_id,
