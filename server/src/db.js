@@ -4,11 +4,8 @@ import pg from 'pg';
 
 const { Pool, types } = pg;
 
-// За замовчуванням pg повертає DATE як JS-об'єкт Date, і через часовий пояс
-// дата може "з'їхати" на день. Віддаємо DATE рядком 'YYYY-MM-DD'.
+
 types.setTypeParser(1082, (value) => value);
-// COUNT/SUM у PostgreSQL мають тип bigint/numeric, а pg віддає їх рядками.
-// Наші числа невеликі, тому перетворюємо в звичайні числа.
 types.setTypeParser(20, (value) => parseInt(value, 10));
 types.setTypeParser(1700, (value) => parseFloat(value));
 

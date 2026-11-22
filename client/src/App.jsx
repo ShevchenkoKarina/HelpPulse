@@ -1,3 +1,4 @@
+//Карта сторінок: яка адреса веде на яку сторінку (/request → форма заявки, /admin/stock → склад)
 import { Routes, Route } from 'react-router-dom';
 import PublicLayout from './components/PublicLayout.jsx';
 import AdminLayout from './components/AdminLayout.jsx';

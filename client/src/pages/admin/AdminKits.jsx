@@ -108,7 +108,7 @@ export default function AdminKits() {
   const [assign, setAssign] = useState(null);
   return (
     <>
-      <PageHeader title="Сформовані набори">Набори, які вже зібрано зі складів під заявки (формуються в розділі «Заявки»). Для набору без доставки призначте волонтера й маршрут.</PageHeader>
+      <PageHeader title="Сформовані набори">Набори, які вже зібрано зі складів під заявки </PageHeader>
       <section className="panel">
         {loading && <Loading />}
         {error && <ErrorState error={error} onRetry={reload} />}
