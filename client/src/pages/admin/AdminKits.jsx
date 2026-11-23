@@ -12,12 +12,19 @@ import { Empty, ErrorState, Loading } from '../../components/States.jsx';
 function DeliveryForm({ kit, onClose, onSaved }) {
   const volunteers = useApi('/volunteers');
   const routes = useApi('/routes');
-  const [f, setF] = useState({ volunteer_id: '', route_id: '', start_point: '', end_point: '', planned_date: '', volunteer_note: '' });
+  const [f, setF] = useState({ volunteer_id: '', route_id: '', start_point: '', end_point: '', distance_km: '', planned_date: '', volunteer_note: '' });
   const [errors, setErrors] = useState({});
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => { setF({ ...f, [k]: e.target.value }); setErrors((x) => ({ ...x, [k]: undefined })); };
   const isNew = f.route_id === 'new';
+  // Вибір маршруту: для наявного підставляємо його відстань, для нового поле вводиться вручну
+  const pickRoute = (e) => {
+    const v = e.target.value;
+    const r = (routes.data || []).find((x) => String(x.route_id) === v);
+    setF({ ...f, route_id: v, distance_km: r && r.distance_km ? String(r.distance_km) : '' });
+    setErrors((x) => ({ ...x, route_id: undefined, distance_km: undefined }));
+  };
 
   async function submit(e) {
     e.preventDefault();
@@ -27,6 +34,10 @@ function DeliveryForm({ kit, onClose, onSaved }) {
     if (isNew) {
       if (!f.start_point.trim()) x.start_point = 'Вкажіть початок маршруту';
       if (!f.end_point.trim()) x.end_point = 'Вкажіть кінець маршруту';
+      if (f.distance_km.trim()) {
+        const d = Number(f.distance_km.replace(',', '.'));
+        if (!Number.isFinite(d) || d <= 0) x.distance_km = 'Відстань має бути додатним числом';
+      }
     }
     if (!f.planned_date) x.planned_date = 'Оберіть планову дату доставки';
     setErrors(x); setErr('');
@@ -34,6 +45,7 @@ function DeliveryForm({ kit, onClose, onSaved }) {
     const body = { kit_id: kit.kit_id, volunteer_id: Number(f.volunteer_id), planned_date: f.planned_date };
     if (f.volunteer_note.trim()) body.volunteer_note = f.volunteer_note.trim();
     if (isNew) body.route = { start_point: f.start_point.trim(), end_point: f.end_point.trim() };
+    if (isNew && f.distance_km.trim()) body.route.distance_km = f.distance_km.replace(',', '.');
     else body.route_id = Number(f.route_id);
     setBusy(true);
     try { await api('/deliveries', { method: 'POST', body }); onSaved(); onClose(); }
@@ -54,9 +66,9 @@ function DeliveryForm({ kit, onClose, onSaved }) {
           </select>
         </Field>
         <Field label="Маршрут" error={errors.route_id}>
-          <select className="input select" value={f.route_id} onChange={set('route_id')}>
+          <select className="input select" value={f.route_id} onChange={pickRoute}>
             <option value="">Оберіть маршрут…</option>
-            {(routes.data || []).map((r) => <option key={r.route_id} value={r.route_id}>{r.start_point} → {r.end_point}</option>)}
+            {(routes.data || []).map((r) => <option key={r.route_id} value={r.route_id}>{r.start_point} → {r.end_point}{r.distance_km ? ` (${formatNumber(r.distance_km)} км)` : ''}</option>)}
             <option value="new">Новий маршрут…</option>
           </select>
         </Field>
@@ -66,6 +78,9 @@ function DeliveryForm({ kit, onClose, onSaved }) {
             <Field label="Куди" error={errors.end_point}><input className="input" value={f.end_point} onChange={set('end_point')} /></Field>
           </div>
         )}
+        <Field label="Відстань, км" optional={isNew} error={errors.distance_km}>
+          <input className="input" inputMode="decimal" placeholder={isNew ? 'Наприклад, 120' : '—'} value={f.distance_km} onChange={set('distance_km')} readOnly={!isNew} disabled={!f.route_id} />
+        </Field>
         <Field label="Планова дата доставки" error={errors.planned_date}><input className="input" type="date" value={f.planned_date} onChange={set('planned_date')} /></Field>
         <Field label="Примітка для волонтера" optional><textarea className="input" maxLength={500} value={f.volunteer_note} onChange={set('volunteer_note')} /></Field>
         {err && <div className="alert" role="alert">{err}</div>}
@@ -108,7 +123,7 @@ export default function AdminKits() {
   const [assign, setAssign] = useState(null);
   return (
     <>
-      <PageHeader title="Сформовані набори">Набори, які вже зібрано зі складів під заявки </PageHeader>
+      <PageHeader title="Сформовані набори">Набори, які вже зібрано зі складів під заявки (формуються в розділі «Заявки»). Для набору без доставки призначте волонтера й маршрут.</PageHeader>
       <section className="panel">
         {loading && <Loading />}
         {error && <ErrorState error={error} onRetry={reload} />}

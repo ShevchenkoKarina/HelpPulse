@@ -17,13 +17,12 @@ export const pool = new Pool({
   database: process.env.DB_NAME || 'helppulse',
 });
 
-/** Звичайний запит: query('SELECT ... WHERE id = $1', [id]) */
 export function query(text, params) {
   return pool.query(text, params);
 }
 
 /**
- * Виконує кілька запитів як ОДНУ транзакцію (BEGIN ... COMMIT).
+ * Виконує кілька запитів як одну транзакцію (BEGIN ... COMMIT).
  * Якщо всередині виникає помилка, робиться ROLLBACK, і база не змінюється.
  *
  *   await withTransaction(async (client) => {

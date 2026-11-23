@@ -17,7 +17,7 @@ const TRANSITIONS = {
 };
 
 // GET /api/deliveries                   усі доставки (представлення v_deliveries_full)
-// GET /api/deliveries?active=true       лише активні (v_active_deliveries, ЛР №7)
+// GET /api/deliveries?active=true       лише активні (v_active_deliveries,)
 // GET /api/deliveries?status=в дорозі   фільтр за статусом
 router.get('/', asyncHandler(async (req, res) => {
   if (req.query.active === 'true') {
@@ -173,7 +173,7 @@ router.patch('/:id/note', asyncHandler(async (req, res) => {
   res.json(rows[0]);
 }));
 
-// POST /api/deliveries/:id/complete   ТРАНЗАКЦІЯ завершення доставки (ЛР №7, завдання 5):
+// POST /api/deliveries/:id/complete   ТРАНЗАКЦІЯ завершення доставки:
 //   BEGIN -> UPDATE delivery (статус «доставлено», actual_date) -> (UPDATE заявки) -> INSERT feedback -> COMMIT.
 // Тіло (необов'язкове): { rating: 1..5, review_text }. Якщо rating вказано, додається відгук.
 // Якщо будь-яка з дій не вдалася, ROLLBACK: статус доставки не змінюється.

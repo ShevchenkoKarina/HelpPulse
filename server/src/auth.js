@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 import { Router } from 'express';
 import { HttpError, asyncHandler } from './utils.js';
 
-const TTL_MS = 8 * 60 * 60 * 1000; // токен діє 8 годин
+const TTL_MS = 8 * 60 * 60 * 1000; 
 
 function password() {
   return process.env.ADMIN_PASSWORD || '1234';
