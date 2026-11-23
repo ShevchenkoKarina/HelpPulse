@@ -54,11 +54,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
   res.json({ ...head.rows[0], items: items.rows });
 }));
 
-// POST /api/kits   ТРАНЗАКЦІЯ формування набору:
-//   перевірка заявки -> перевірка залишків -> списання зі складу -> набір + його склад -> статус заявки.
-// Тіло: { request_id, warehouse_id, items?: [{ item_id, quantity }] }
-// Якщо items не вказано, набір формується за позиціями заявки.
-// Якщо на складі не вистачає хоча б одного товару, жодних змін не буде (ROLLBACK).
+// POST /api/kits ТРАНЗАКЦІЯ формування набору:
 router.post('/', asyncHandler(async (req, res) => {
   const body = req.body || {};
   const requestId = toInt(body.request_id, 'заявка');
